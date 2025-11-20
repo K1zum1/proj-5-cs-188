@@ -31,6 +31,18 @@ def train_perceptron(model, dataset):
     with no_grad():
         dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
         "*** YOUR CODE HERE ***"
+        convergence = True
+        while convergence: # we want to begin by looping through the entire dataset
+            convergence = False
+            for i in dataloader: # extract features and the true class label from the i
+                x = i['x']
+                y = i['label']
+
+                predict = model.get_prediction(x) # we wanna get the models current guess for this specific sample
+
+                if predict != y.item(): ## if guess is wrong, try again 
+                    convergence = True
+                    model.weight += y * x # if its right then update the weights
 
 
 def train_regression(model, dataset):

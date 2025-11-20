@@ -42,13 +42,14 @@ class PerceptronModel(Module):
         super(PerceptronModel, self).__init__()
 
         "*** YOUR CODE HERE ***"
+        self.weight = Parameter(ones(1, dimensions)) # initialize weights as a pytorch param
 
 
     def get_weights(self):
         """
         Return a Parameter instance with the current weights of the perceptron.
         """
-        return self.w
+        return self.weight # helper to access the weights
 
     def forward(self, x):
         """
@@ -61,6 +62,7 @@ class PerceptronModel(Module):
         The pytorch function `tensordot` may be helpful here.
         """
         "*** YOUR CODE HERE ***"
+        return matmul(x, self.weight.T) # matrix multiplication between input x and the weights
 
         
 
@@ -73,6 +75,10 @@ class PerceptronModel(Module):
         score = self(x)
 
         "*** YOUR CODE HERE ***"
+        if score >= 0: # general perceptron rule is score is 0/positive then classify as 1, else -1
+            return 1
+        else:
+            return -1
 
 
 
