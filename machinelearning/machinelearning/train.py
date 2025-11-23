@@ -95,3 +95,20 @@ def Train_DigitConvolution(model, dataset):
     Trains the model.
     """
     """ YOUR CODE HERE """
+    optimal = optim.Adam(model.parameters(), lr=0.01)
+    loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    model.train()
+
+    epoch = 5
+
+    for epochs in range(epoch):
+        for batch in loader:
+            features = batch['x']
+            labels = batch['label']
+            optimal.zero_grad()
+            predictions = model(features)
+            loss = digitconvolution_Loss(predictions, labels)
+            loss.backward()
+            optimal.step()
+
+
