@@ -69,6 +69,18 @@ def train_digitclassifier(model, dataset):
     """
     model.train()
     """ YOUR CODE HERE """
+    data_loader = DataLoader(dataset, batch_size=16, shuffle=True)
+    op = optim.SGD(model.parameters(), lr=0.02)
+    for _ in range(15): #epoch number I think -- staff used 5
+        for i in data_loader:
+            x = i['x']
+            y = i['label']
+            op.zero_grad()
+            outputs = model(x)
+            loss = digitclassifier_loss(outputs, y)
+            loss.backward()
+            op.step()
+    
 
 
 def train_languageid(model, dataset):
