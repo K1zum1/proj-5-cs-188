@@ -71,7 +71,7 @@ def train_digitclassifier(model, dataset):
     """ YOUR CODE HERE """
     data_loader = DataLoader(dataset, batch_size=16, shuffle=True)
     op = optim.SGD(model.parameters(), lr=0.02)
-    for _ in range(15): #epoch number I think -- staff used 5
+    for epochs in range(15): #epoch number I think -- staff used 5
         for i in data_loader:
             x = i['x']
             y = i['label']
@@ -107,3 +107,20 @@ def Train_DigitConvolution(model, dataset):
     Trains the model.
     """
     """ YOUR CODE HERE """
+    optimal = optim.Adam(model.parameters(), lr=0.01)
+    loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    model.train()
+
+    epoch = 5
+
+    for epochs in range(epoch):
+        for batch in loader:
+            features = batch['x']
+            labels = batch['label']
+            optimal.zero_grad()
+            predictions = model(features)
+            loss = digitconvolution_Loss(predictions, labels)
+            loss.backward()
+            optimal.step()
+
+

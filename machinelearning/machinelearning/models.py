@@ -231,6 +231,20 @@ def Convolve(input: tensor, weight: tensor):
     weight_dimensions = weight.shape
     Output_Tensor = tensor(())
     "*** YOUR CODE HERE ***"
+    # not sure if this is a scuffed way of doing it but, our formula is output = input - kernel + 1
+    # so like a 28x28 iput with 3x3 weight will give us a 26x26 output
+    h = input_tensor_dimensions[0] - weight_dimensions[0] + 1
+    w = input_tensor_dimensions[1] - weight_dimensions[1] + 1
+    r = []
+
+    for i in range(h): # slide the window over the image height
+        c = []
+        for x in range(w): # slide the window over image width
+            slice = input[i : i + weight_dimensions[0], x : x + weight_dimensions[1]] # extract the receptive field from the input and look at the area matching the weight
+            c.append((slice * weight).sum()) # apply kernel operation which wil give us back a single scalar value
+        r.append(stack(c)) # then stack the columns and rows to complete the 2d Tensor
+    Output_Tensor = stack(r)
+    return Output_Tensor
 
     "*** End Code ***"
     return Output_Tensor
@@ -255,6 +269,8 @@ class DigitConvolutionalModel(Module):
 
         self.convolution_weights = Parameter(ones((3, 3)))
         """ YOUR CODE HERE """
+        self.layer1 = Linear(676, 128) # 28 - 3 + 1= 26, 26*26 = 676
+        self.layer2 = Linear(128, output_size)  # maps the hidden 128 units to 10 classes
 
 
     def forward(self, x):
@@ -268,6 +284,11 @@ class DigitConvolutionalModel(Module):
         )
         x = x.flatten(start_dim=1)
         """ YOUR CODE HERE """
+        x = self.layer1(x) # linear
+        x = relu(x) # activation
+        x = self.layer2(x) # final projection
+        
+        return x
 
 
 class Attention(Module):
