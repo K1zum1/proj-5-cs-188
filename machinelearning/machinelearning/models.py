@@ -349,13 +349,10 @@ class Attention(Module):
         Q = self.q_layer(input)
         V = self.v_layer(input)
 
-
-        dot_prod = tensordot(Q, K.transpose(-2, -1), dims=[[2],[1]]) 
-        squared = dot_prod / (C ** 0.5) #inner QK^T / sqrt(dk)
-        sliced = self.mask[:, :, :T, :T]
-        masked = squared.masked_fill(sliced == 0, float('-inf'))[0]
-        soft_maxed = softmax(masked, dim=-1).unsqueeze(0).repeat(B, 1, 1) # softmax on last dim 
-        return tensordot(soft_maxed, V, dims=[[2],[1]])
+        dot_prod = matmul(Q, K.transpose(-2, -1))/ (C ** 0.5) #inner QK^T / sqrt(dk)
+        masked = dot_prod.masked_fill(self.mask[:, :, :T, :T] == 0, float('-inf'))[0]
+        soft_maxed = softmax(masked, dim=-1)
+        return matmul(soft_maxed, V)
 
 
 
