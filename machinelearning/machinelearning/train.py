@@ -99,6 +99,17 @@ def train_languageid(model, dataset):
     """
     model.train()
     "*** YOUR CODE HERE ***"
+    data_loader = DataLoader(dataset, batch_size=16, shuffle=True)
+    optimal = optim.Adam(model.parameters(), lr=0.001)
+    for epochs in range(15):
+        for data in data_loader:
+            x = movedim(data['x'], 1, 0) #swithc dims
+            y = data['label']
+            optimal.zero_grad()
+            loss = languageid_loss(model(x), y)
+            loss.backward()
+            optimal.step()
+            
 
 
 

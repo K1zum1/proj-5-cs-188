@@ -173,7 +173,10 @@ class LanguageIDModel(Module):
         self.languages = ["English", "Spanish", "Finnish", "Dutch", "Polish"]
         super(LanguageIDModel, self).__init__()
         "*** YOUR CODE HERE ***"
-        # Initialize your model parameters here
+        self.input = Linear(self.num_chars, 128) 
+        self.hidden = Linear(128, 128)
+        self.output = Linear(128, len(self.languages))
+
 
 
 
@@ -207,6 +210,19 @@ class LanguageIDModel(Module):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        #print("xs: ", xs)
+        for node in range(len(xs)): #xs is a list
+            #print("node: ", node)
+            input = self.input(xs[node])
+            if node != 0:
+                hidden = relu(self.hidden(hidden) + input)
+            else:
+                hidden = relu(input)
+        #print("hidden: ", hidden)
+        #print("output: ", self.output(hidden))
+        return self.output(hidden)
+
+            
 
 
 
@@ -312,6 +328,7 @@ class Attention(Module):
 
         self.layer_size = layer_size
 
+
     def forward(self, input):
         """
         Applies the attention mechanism to input. All necessary layers have
@@ -328,4 +345,20 @@ class Attention(Module):
         B, T, C = input.size()
 
         """YOUR CODE HERE"""
+        K = self.k_layer(input)
+        Q = self.q_layer(input)
+        V = self.v_layer(input)
+
+
+        dot_prod = tensordot(Q, K.transpose(-2, -1), dims=[[2],[1]]) 
+        squared = dot_prod / (C ** 0.5) #inner QK^T / sqrt(dk)
+        sliced = self.mask[:, :, :T, :T]
+        masked = squared.masked_fill(sliced == 0, float('-inf'))[0]
+        soft_maxed = softmax(masked, dim=-1).unsqueeze(0).repeat(B, 1, 1) # softmax on last dim 
+        return tensordot(soft_maxed, V, dims=[[2],[1]])
+
+
+
+
+
 
