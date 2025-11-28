@@ -61,6 +61,24 @@ def train_regression(model, dataset):
         
     """
     "*** YOUR CODE HERE ***"
+    optimal = optim.Adam(model.parameters(), lr=0.001)
+    # optimal = optim.SGD(model.parameters(), lr=0.001) # SGD is too slow, NN need adam for sin(x) approximations
+    data = DataLoader(dataset, batch_size=256, shuffle=True)
+
+    for epoch in range(2000): # tried 500, 1000, 2000 seems to work
+        model.train()
+        epoch_loss = 0
+        for i in data:
+            optimal.zero_grad()
+            y_pred = model(i['x'])
+            loss = regression_loss(y_pred, i['label'])
+            loss.backward()
+            optimal.step()
+            epoch_loss += loss.item()
+        
+        avg_loss = epoch_loss / len(data)
+        if avg_loss < 0.015:
+            break
 
 
 def train_digitclassifier(model, dataset):
